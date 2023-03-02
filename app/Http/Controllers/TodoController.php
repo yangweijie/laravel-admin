@@ -45,4 +45,9 @@ class TodoController extends Controller
         Todo::where('completed', 1)->delete();
         return $this->index($request);
     }
+
+    public function allComplete(Request $request){
+        Todo::where('id', '>', 0)->update(['completed'=>$request->get('completed', 0)]);
+        return $this->index($request);
+    }
 }

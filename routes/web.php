@@ -22,6 +22,7 @@ Route::controller(TodoController::class)->group(function () {
     Route::get('/todo', 'index');
     Route::post('/todo', 'store');
     Route::put('/todo', 'upd');
+    Route::put('/todo/allDone', 'allComplete');
     Route::delete('/todo', 'delete');
     Route::delete('/todo/delComplete', 'deleteComplete');
 });

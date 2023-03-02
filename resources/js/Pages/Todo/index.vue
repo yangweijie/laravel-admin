@@ -10,13 +10,13 @@
         </header>
         <section class="main" v-show="todos.length">
             <form @submit.prevent="form.put('/todo')">
-                <input id="toggle-all" class="toggle-all" type="checkbox" v-model="form.allDone">
+                <input id="toggle-all" class="toggle-all" type="checkbox" v-model="allDone">
                 <label for="toggle-all">Mark all as complete</label>
             </form>
             <ul class="todo-list">
                 <li class="todo" v-for="todo in todos" :key="todo.id" :class="{completed: todo.completed, editing: todo == form.editedTodo}">
                     <div class="view">
-                        <input class="toggle" type="checkbox" v-model="todo.completed" @change="editTodo(todo)">
+                        <input class="toggle" type="checkbox" v-model="todo.completed" @blur="doneEdit(todo)" @change="editTodo(todo)">
                         <label @dblclick="editTodo(todo)">{{todo.title}}</label>
                         <button class="destroy" @click="removeTodo(todo)"></button>
                     </div>
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { Head, Link, useForm} from '@inertiajs/vue2'
+import { Head, Link, useForm, router} from '@inertiajs/vue2'
 export default {
     components: {
         Head,
@@ -59,12 +59,21 @@ export default {
     },
     data() {
         return {
-            beforeEditCache: '',
             form: useForm({
                 title: '',
-                editedTodo: {},
+                editedTodo: null,
                 type: 'all',
             }),
+        }
+    },
+    computed: {
+        allDone: {
+            get: function () {
+                return this.left === 0;
+            },
+            set: function (value) {
+                router.put('/todo/allDone', {completed: value})
+            }
         }
     },
     methods:{
@@ -82,11 +91,7 @@ export default {
         editTodo: function (todo) {
             this.beforeEditCache = todo.title;
             this.form.editedTodo = todo;
-            this.form.put('/todo', {
-                data:{
-                    editedTodo:todo
-                }
-            })
+            console.log(todo == this.form.editedTodo);
         },
 
         doneEdit: function (todo) {
@@ -97,6 +102,8 @@ export default {
             todo.title = todo.title.trim();
             if (!todo.title) {
                 this.removeTodo(todo);
+            }else{
+                router.put('/todo', {editedTodo: todo})
             }
         },
 

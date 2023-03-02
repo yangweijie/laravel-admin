@@ -2074,13 +2074,24 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      beforeEditCache: '',
       form: (0,_inertiajs_vue2__WEBPACK_IMPORTED_MODULE_0__.useForm)({
         title: '',
-        editedTodo: {},
+        editedTodo: null,
         type: 'all'
       })
     };
+  },
+  computed: {
+    allDone: {
+      get: function get() {
+        return this.left === 0;
+      },
+      set: function set(value) {
+        _inertiajs_vue2__WEBPACK_IMPORTED_MODULE_0__.router.put('/todo/allDone', {
+          completed: value
+        });
+      }
+    }
   },
   methods: {
     pluralize: function pluralize(word, count) {
@@ -2096,11 +2107,7 @@ __webpack_require__.r(__webpack_exports__);
     editTodo: function editTodo(todo) {
       this.beforeEditCache = todo.title;
       this.form.editedTodo = todo;
-      this.form.put('/todo', {
-        data: {
-          editedTodo: todo
-        }
-      });
+      console.log(todo == this.form.editedTodo);
     },
     doneEdit: function doneEdit(todo) {
       if (!this.form.editedTodo) {
@@ -2110,6 +2117,10 @@ __webpack_require__.r(__webpack_exports__);
       todo.title = todo.title.trim();
       if (!todo.title) {
         this.removeTodo(todo);
+      } else {
+        _inertiajs_vue2__WEBPACK_IMPORTED_MODULE_0__.router.put('/todo', {
+          editedTodo: todo
+        });
       }
     },
     cancelEdit: function cancelEdit(todo) {
@@ -2218,8 +2229,8 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.form.allDone,
-      expression: "form.allDone"
+      value: _vm.allDone,
+      expression: "allDone"
     }],
     staticClass: "toggle-all",
     attrs: {
@@ -2227,23 +2238,23 @@ var render = function render() {
       type: "checkbox"
     },
     domProps: {
-      checked: Array.isArray(_vm.form.allDone) ? _vm._i(_vm.form.allDone, null) > -1 : _vm.form.allDone
+      checked: Array.isArray(_vm.allDone) ? _vm._i(_vm.allDone, null) > -1 : _vm.allDone
     },
     on: {
       change: function change($event) {
-        var $$a = _vm.form.allDone,
+        var $$a = _vm.allDone,
           $$el = $event.target,
           $$c = $$el.checked ? true : false;
         if (Array.isArray($$a)) {
           var $$v = null,
             $$i = _vm._i($$a, $$v);
           if ($$el.checked) {
-            $$i < 0 && _vm.$set(_vm.form, "allDone", $$a.concat([$$v]));
+            $$i < 0 && (_vm.allDone = $$a.concat([$$v]));
           } else {
-            $$i > -1 && _vm.$set(_vm.form, "allDone", $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+            $$i > -1 && (_vm.allDone = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
           }
         } else {
-          _vm.$set(_vm.form, "allDone", $$c);
+          _vm.allDone = $$c;
         }
       }
     }
@@ -2278,6 +2289,9 @@ var render = function render() {
         checked: Array.isArray(todo.completed) ? _vm._i(todo.completed, null) > -1 : todo.completed
       },
       on: {
+        blur: function blur($event) {
+          return _vm.doneEdit(todo);
+        },
         change: [function ($event) {
           var $$a = todo.completed,
             $$el = $event.target,
