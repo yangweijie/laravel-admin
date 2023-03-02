@@ -2456,6 +2456,9 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
 var vm = (0,_inertiajs_vue2__WEBPACK_IMPORTED_MODULE_0__.createInertiaApp)({
+  progress: {
+    color: '#29d'
+  },
   resolve: function resolve(name) {
     return __webpack_require__("./resources/js/Pages sync recursive ^\\.\\/.*$")("./".concat(name));
   },
