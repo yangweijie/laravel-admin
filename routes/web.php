@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TodoController;
 use App\Http\Middleware\HandleInertiaRequests;
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['web', HandleInertiaRequests::class])->get('todo', function () {
-    return inertia('Todo/index');
+Route::controller(TodoController::class)->group(function () {
+    Route::get('/todo', 'index');
+    Route::post('/todo', 'store');
+    Route::put('/todo', 'upd');
+    Route::delete('/todo', 'delete');
+    Route::delete('/todo/delComplete', 'deleteComplete');
 });
+
+// Route::middleware(['web', HandleInertiaRequests::class])->get('todo', function () {
+//     return inertia('Todo/index');
+// });
